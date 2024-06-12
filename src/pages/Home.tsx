@@ -10,7 +10,7 @@ const Home = () => {
         <div className='flex justify-end gap-8 border-b-2 p-8'>
           <Link to='/sign-in'>Sign in</Link>
           <Link to='/sign-up'>Sign up</Link>
-        </div>
+        </div> {/* replace with landing page */}
       </SignedOut>
       <SignedIn>
         <div className='flex justify-end gap-8 p-8'>

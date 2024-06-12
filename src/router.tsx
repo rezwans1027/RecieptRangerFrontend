@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Onboarding from './pages/Onboarding'
+import Register from './pages/Register'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -15,6 +16,7 @@ const router = createBrowserRouter(
       <Route path='sign-up' element={<SignUp />} />
       <Route path='sign-in' element={<SignIn />} />
       <Route path='/onboarding' element={<Onboarding />} />
+      <Route path='/register' element={<Register />} />
     </Route>
   )
 )

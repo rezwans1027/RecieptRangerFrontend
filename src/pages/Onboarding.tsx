@@ -44,17 +44,16 @@ const Onboarding = () => {
   const navigate = useNavigate()
   const { userId } = useAuth()
 
-  console.log(userId)
-
   const { userInfo, isLoading } = useGetUserInfo(userId!)
-  const { onboardUser } = useUserOnboarding(userId!)
+  const { onboardUser, error } = useUserOnboarding(userId!)
   const [selectedRole, setSelectedRole] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     if (userInfo && userInfo.onboarded) {
       navigate('/')
-    } 
-  } , [userInfo, navigate])
+    }
+  }, [userInfo, navigate])
 
   const form = useForm({
     resolver: async (data, context, options) => {
@@ -63,7 +62,7 @@ const Onboarding = () => {
     },
     defaultValues: {
       role: '',
-      organization: '',
+      organization: undefined,
     },
   })
 
@@ -73,15 +72,32 @@ const Onboarding = () => {
     onboardUser(data)
   }
 
+  useEffect(() => {
+    if (error) {
+      const errorString = error.message
+      const messageKeyPosition = errorString.indexOf('"message":"')
+
+      // Calculate the start position of the actual message
+      const messageStart = messageKeyPosition + '"message":"'.length
+
+      // Find the position of the closing quote
+      const messageEnd = errorString.indexOf('"', messageStart)
+
+      // Extract the message using substring
+      const message = errorString.substring(messageStart, messageEnd)
+
+      setErrorMessage(message)
+    }
+  }, [error])
+
   if (isLoading) {
     return <div>Loading...</div>
   }
 
-
   return (
     <div className='flex h-screen flex-col items-center justify-center gap-4'>
       <div className='mb-16 text-2xl'>
-        Welcome {userInfo.username}. Select your role!
+        Welcome {userInfo.firstName}! Select your role.
       </div>
       <Form {...form}>
         <form
@@ -138,11 +154,14 @@ const Onboarding = () => {
                 <FormDescription>
                   Only an admin can create an organization. Managers and
                   employees must be invited to join an organization.
+
+                  {errorMessage && <div className='mt-4 text-red-600'>{errorMessage}</div>}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
+          
           <Button type='submit'>Submit</Button>
         </form>
       </Form>

@@ -1,6 +1,6 @@
 export interface OnboardingForm {
     role: string
-    organization: number
+    organization?: number | null
   }
 
 

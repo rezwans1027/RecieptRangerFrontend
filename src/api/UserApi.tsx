@@ -39,7 +39,6 @@ export const useGetUserInfo = (clerkId: string) => {
 export const useUserOnboarding = (clerkId: string) => {
   const queryClient = useQueryClient()
   const userOnboardingRequest = async (formData: OnboardingForm) => {
-    console.log('formData:', formData)
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/users/${clerkId}/onboarding`,
@@ -54,8 +53,7 @@ export const useUserOnboarding = (clerkId: string) => {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('Failed to onboard user:', errorText)
-        throw new Error('Failed to onboard user')
+        throw new Error(errorText)
       }
 
       const data = await response.json()
@@ -75,4 +73,37 @@ export const useUserOnboarding = (clerkId: string) => {
   },})
 
   return { onboardUser, isLoading, error }
+}
+
+export const useGetInvitation = (token: string) => {
+  const getInvitationRequest = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/register/${token}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Failed to get invitation:', errorText)
+        throw new Error('Failed to get invitation')
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error in getInvitationRequest:', error)
+      throw error
+    }
+  }
+
+  const {
+    data: invitation,
+    isLoading,
+    error,
+  } = useQuery(['fetchInvitation', token], getInvitationRequest)
+
+  return { invitation, isLoading, error }
 }
