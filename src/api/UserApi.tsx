@@ -107,3 +107,41 @@ export const useGetInvitation = (token: string) => {
 
   return { invitation, isLoading, error }
 }
+
+export const useAcceptInvitation = (token: string) => {
+  const queryClient = useQueryClient()
+  const acceptInvitationRequest = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/register/${token}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error in acceptInvitationRequest:', error)
+      throw error
+    }
+  }
+
+  const {
+    mutateAsync: acceptInvitation,
+    isLoading,
+    error,
+  } = useMutation(acceptInvitationRequest, {onSuccess: () => {
+    queryClient.invalidateQueries("fetchUserInfo");
+  },})
+
+  return { acceptInvitation, isLoading, error }
+}

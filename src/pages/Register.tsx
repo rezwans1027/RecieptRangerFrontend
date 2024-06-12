@@ -1,4 +1,4 @@
-import { useGetInvitation } from '@/api/UserApi'
+import { useAcceptInvitation, useGetInvitation } from '@/api/UserApi'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@clerk/clerk-react'
 import { useEffect } from 'react'
@@ -19,10 +19,28 @@ const Register = () => {
 
   const queryParams = new URLSearchParams(location.search)
   const token = queryParams.get('token')
-  const { invitation } = useGetInvitation(token!)
+  const { invitation, isLoading } = useGetInvitation(token!)
+  const { acceptInvitation } = useAcceptInvitation(token!)
+
+  if (isLoading) {
+    return (
+      <h1 className='flex h-screen flex-col items-center justify-center gap-4'>
+        Loading...
+      </h1>
+    )
+  }
 
   if (!invitation) {
-    return null
+    return (
+      <h1 className='flex h-screen flex-col items-center justify-center gap-4'>
+        Invitation not found
+      </h1>
+    )
+  }
+
+  const clickHandler = async () => {
+    acceptInvitation()
+    navigate('/')
   }
 
   return (
@@ -31,10 +49,11 @@ const Register = () => {
         <div className='flex flex-col items-center gap-8'>
           <h1 className='text-5xl italic'>Reciept Ranger</h1>
           <h1 className='text-xl'>
-            You have been invited to join {invitation.organizationName} as a {invitation.roleName}
+            You have been invited to join {invitation.organizationName} as a{' '}
+            {invitation.roleName}
           </h1>
         </div>
-        <Button>Accept Invitation</Button>
+        <Button onClick={clickHandler}>Accept Invitation</Button>
       </div>
     </div>
   )
