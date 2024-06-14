@@ -8,6 +8,7 @@ export const useGetUserInfo = (clerkId: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/users/${clerkId}`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
