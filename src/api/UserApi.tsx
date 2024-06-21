@@ -1,7 +1,10 @@
 import { OnboardingForm } from '@/types'
+import { useAuth } from '@clerk/clerk-react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 
-const API_BASE_URL = 'http://localhost:3000' // move to .env file
+
+const API_BASE_URL = 'http://localhost:3000' // TODO: move to .env file
+
 
 export const useGetUserInfo = (clerkId: string) => {
   const getUserInfoRequest = async () => {
@@ -69,9 +72,11 @@ export const useUserOnboarding = (clerkId: string) => {
     mutateAsync: onboardUser,
     isLoading,
     error,
-  } = useMutation(userOnboardingRequest, {onSuccess: () => {
-    queryClient.invalidateQueries("fetchUserInfo");
-  },})
+  } = useMutation(userOnboardingRequest, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('fetchUserInfo')
+    },
+  })
 
   return { onboardUser, isLoading, error }
 }
@@ -79,12 +84,15 @@ export const useUserOnboarding = (clerkId: string) => {
 export const useGetInvitation = (token: string) => {
   const getInvitationRequest = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/register/${token}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/register/${token}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -140,9 +148,59 @@ export const useAcceptInvitation = (token: string) => {
     mutateAsync: acceptInvitation,
     isLoading,
     error,
-  } = useMutation(acceptInvitationRequest, {onSuccess: () => {
-    queryClient.invalidateQueries("fetchUserInfo");
-  },})
+  } = useMutation(acceptInvitationRequest, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('fetchUserInfo')
+    },
+  })
 
   return { acceptInvitation, isLoading, error }
+}
+
+export const useGetInvitations = (
+  organization: string,
+  senderEmail: string,
+) => {
+  const { getToken } = useAuth()
+
+  const getInvitationsRequest = async () => {
+    try {
+      const token = await getToken()
+
+      if (!token) {
+        throw new Error('No token found')
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/invitations/${organization}/${senderEmail}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Failed to get invitations:', errorText)
+        throw new Error('Failed to get invitations')
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error in getInvitationsRequest:', error)
+      throw error
+    }
+  }
+
+  const {
+    data: invitations,
+    isLoading,
+    error,
+  } = useQuery(['fetchInvitations', organization], getInvitationsRequest)
+
+  return { invitations, isLoading, error }
 }
