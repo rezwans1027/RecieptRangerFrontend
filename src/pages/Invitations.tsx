@@ -13,7 +13,7 @@ import { formatRole, formatManager, formatTimeAgo } from '@/lib/utils'
 
 const Invitations = () => {
   const [invitationsList, setInvitationsList] = useState([])
-  const { invitations, isLoading } = useGetInvitations('11', 'enter email here') // TODO: get email and put in here
+  const { invitations, isLoading } = useGetInvitations() 
 
   useEffect(() => {
     if (invitations) {
@@ -26,15 +26,15 @@ const Invitations = () => {
   if (isLoading) {
     return <div>Loading...</div> // TODO: Add a loader and remove this 
   }
-
-  
+  // TODO: only admin and manager should be able to see this page
+  // TODO: Make more responsive 
   return (
     <div className='h-screen w-[100%] bg-slate-200 p-8'>
-      <div className='flex items-center justify-between'>
+      <div className='flex items-center justify-between mb-6'>
         <h1 className='text-2xl font-semibold'>Invitations</h1>
         <Button className='px-5'>Invite</Button>
       </div>
-      <div className='mt-6 overflow-x-auto rounded-xl bg-white'>
+      <div className='overflow-x-auto rounded-xl bg-white'>
         <Table className='min-w-full max-md:text-xs'>
           <TableHeader>
             <TableRow>

@@ -9,7 +9,7 @@ const API_BASE_URL = 'http://localhost:3000' // TODO: move to .env file
 export const useGetUserInfo = (clerkId: string) => {
   const getUserInfoRequest = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/users/${clerkId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/user/${clerkId}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -157,10 +157,7 @@ export const useAcceptInvitation = (token: string) => {
   return { acceptInvitation, isLoading, error }
 }
 
-export const useGetInvitations = (
-  organization: string,
-  senderEmail: string,
-) => {
+export const useGetInvitations = () => {
   const { getToken } = useAuth()
 
   const getInvitationsRequest = async () => {
@@ -172,7 +169,7 @@ export const useGetInvitations = (
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/users/invitations/${organization}/${senderEmail}`,
+        `${API_BASE_URL}/api/users/invitations`,
         {
           method: 'GET',
           headers: {
@@ -200,7 +197,97 @@ export const useGetInvitations = (
     data: invitations,
     isLoading,
     error,
-  } = useQuery(['fetchInvitations', organization], getInvitationsRequest)
+  } = useQuery('fetchInvitations', getInvitationsRequest)
 
   return { invitations, isLoading, error }
+}
+
+export const useGetManagers = () => {
+  const { getToken } = useAuth()
+
+  const getManagersRequest = async () => {
+    try {
+      const token = await getToken()
+
+      if (!token) {
+        throw new Error('No token found')
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/managers`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Failed to get managers:', errorText)
+        throw new Error('Failed to get managers')
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error in getManagersRequest:', error)
+      throw error
+    }
+  }
+
+  const {
+    data: managers,
+    isLoading,
+    error,
+  } = useQuery('fetchManagers', getManagersRequest)
+
+  return { managers, isLoading, error }
+}
+
+export const useGetEmployees = () => {
+  const { getToken } = useAuth()
+
+  const getEmployeesRequest = async () => {
+    try {
+      const token = await getToken()
+
+      if (!token) {
+        throw new Error('No token found')
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/employees`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Failed to get employees:', errorText)
+        throw new Error('Failed to get employees')
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error in getEmployeesRequest:', error)
+      throw error
+    }
+  }
+
+  const {
+    data: employees,
+    isLoading,
+    error,
+  } = useQuery('fetchEmployees', getEmployeesRequest)
+
+  return { employees, isLoading, error }
 }
