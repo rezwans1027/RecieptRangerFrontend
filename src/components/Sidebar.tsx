@@ -8,7 +8,8 @@ import {
   CreditCardIcon,
   Cog8ToothIcon,
 } from '@heroicons/react/24/outline'
-import { useLocation } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router'
 
 const AdminLinks = [
   {
@@ -85,24 +86,34 @@ const EmployeeLinks = [
   },
 ]
 
-const Sidebar = () => {
+const Sidebar = ({  }) => {
   const { userId, isSignedIn } = useAuth()
   const { userInfo, isLoading } = useGetUserInfo(userId as string)
   const location = useLocation()
+  const navigate = useNavigate()
+  const [role, setRole] = useState<string>('employee') // default role
 
-  if (!isSignedIn) {
-    return null
-  }
-  if (isLoading) {
-    return <div>Loading...</div> // add a skeleton
-  }
+  useEffect(() => {
+    if (isSignedIn && !isLoading && userInfo) {
+      setRole(userInfo.role)
+    }
+  }, [isSignedIn, isLoading, userInfo])
 
   const links =
-    userInfo?.role === 'admin'
+    role === 'admin'
       ? AdminLinks
-      : userInfo?.role === 'manager'
+      : role === 'manager'
         ? ManagerLinks
         : EmployeeLinks
+
+  const handleNavigation = async (href: string) => {
+    try {
+      navigate(href)
+    } catch (error) {
+      console.error('Failed to navigate:', error)
+    } finally {
+    }
+  }
 
   return (
     <div className='shadow-lg'>
@@ -112,16 +123,16 @@ const Sidebar = () => {
       <h1 className='pt-2 text-center text-lg italic sm:hidden'>RR</h1>
       <div className='mt-12 p-2'>
         {links.map(link => (
-          <a
+          <button
             key={link.name}
-            href={link.href}
+            onClick={() => handleNavigation(link.href)}
             className={`my-1 flex items-center rounded px-2 py-1 hover:bg-gray-200 max-lg:p-2 max-sm:text-xs lg:w-56 ${
               location.pathname === link.href ? 'bg-gray-200 font-semibold' : ''
             }`}
           >
             <link.icon className='inline h-4 w-4 max-sm:h-6 max-sm:w-6 sm:mr-2' />
             <div className='max-sm:hidden'>{link.name}</div>
-          </a>
+          </button>
         ))}
       </div>
     </div>
