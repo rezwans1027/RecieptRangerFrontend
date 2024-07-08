@@ -242,11 +242,11 @@ export const useGetInvitations = () => {
 
   const {
     data: invitations,
-    isLoading,
+    isLoading: invitationsLoading,
     error,
   } = useQuery('fetchInvitations', getInvitationsRequest)
 
-  return { invitations, isLoading, error }
+  return { invitations, invitationsLoading, error }
 }
 
 export const useGetManagers = () => {

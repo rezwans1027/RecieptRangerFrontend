@@ -22,8 +22,8 @@ const UserCard = ({
   return (
     <div className='flex min-w-48 flex-col items-center rounded-lg bg-white p-2 shadow-lg'>
       <UserCircle size={64} className='my-3' />
-      <div className='overflow-x-scroll text-sm font-bold'>{name}</div>
-      <div className='overflow-x-scroll text-xs'>{email}</div>
+      <div className='text-sm font-bold'>{name}</div>
+      <div className='text-xs'>{email}</div>
       {type === 'manager' && (
         <div className='my-2 text-xs text-slate-500'>
           Employees: {employees}

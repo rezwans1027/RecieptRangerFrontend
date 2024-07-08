@@ -54,7 +54,7 @@ const formSchema = z.object({
   manager: z.number().optional(),
 })
 
-const Invite = () => {
+const AdminInvite = () => {
   const { managers, isLoading } = useGetManagers()
   const [managerList, setManagerList] = useState<{ label: string; value: number }[]>([])
   const [open, setOpen] = useState(false)
@@ -234,4 +234,4 @@ const Invite = () => {
   )
 }
 
-export default Invite
+export default AdminInvite

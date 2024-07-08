@@ -1,4 +1,4 @@
-import { useGetInvitations } from '@/api/UserApi'
+import { useGetInvitations, useGetUserInfo } from '@/api/UserApi'
 import {
   Table,
   TableBody,
@@ -9,11 +9,15 @@ import {
 } from '@/components/ui/table'
 import { useEffect, useState } from 'react'
 import { formatRole, formatManager, formatTimeAgo } from '@/lib/utils'
-import Invite from '@/components/Invite'
+import AdminInvite from '@/components/AdminInvite'
+import { useAuth } from '@clerk/clerk-react'
+import ManagerInvite from '@/components/ManagerInvite'
 
 const Invitations = () => {
   const [invitationsList, setInvitationsList] = useState([])
-  const { invitations, isLoading } = useGetInvitations()
+  const { invitations, invitationsLoading } = useGetInvitations()
+  const { userId } = useAuth()
+  const { userInfo, isLoading } = useGetUserInfo(userId as string)
 
   useEffect(() => {
     if (invitations) {
@@ -21,16 +25,15 @@ const Invitations = () => {
     }
   }, [invitations])
 
-  if (isLoading) {
+  if (invitationsLoading || isLoading) {
     return <div>Loading...</div> // TODO: Add a loader and remove this
   }
-  // TODO: only admin and manager should be able to see this page
-  // TODO: Make more responsive
+
   return (
     <div className='h-screen w-[100%] bg-slate-200 p-8'>
       <div className='mb-6 flex items-center justify-between'>
         <h1 className='text-2xl font-semibold'>Invitations</h1>
-        <Invite />
+        {userInfo.role === 'admin' ? <AdminInvite /> : <ManagerInvite />}
       </div>
       <div className='overflow-x-auto rounded-xl bg-white'>
         <Table className='min-w-full max-md:text-xs'>

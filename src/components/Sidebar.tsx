@@ -52,6 +52,11 @@ const ManagerLinks = [
     icon: PresentationChartBarIcon,
   },
   {
+    name: 'Invitations',
+    href: '/invitations',
+    icon: EnvelopeOpenIcon,
+  },
+  {
     name: 'Employees',
     href: '/employees',
     icon: UserIcon,
@@ -115,6 +120,10 @@ const Sidebar = ({  }) => {
     }
   }
 
+  if (isLoading) {
+    return <div>Loading...</div> // TODO: Add a loader and remove this
+  }
+
   return (
     <div className='shadow-lg'>
       <h1 className='pt-4 text-center text-lg italic max-sm:hidden lg:text-[1.6rem]'>
@@ -130,7 +139,7 @@ const Sidebar = ({  }) => {
               location.pathname === link.href ? 'bg-gray-200 font-semibold' : ''
             }`}
           >
-            <link.icon className='inline h-4 w-4 max-sm:h-6 max-sm:w-6 sm:mr-2' />
+            <link.icon className='inline h-4 w-4 max-sm:h-6 max-sm:w-6 sm:mr-2 ' />
             <div className='max-sm:hidden'>{link.name}</div>
           </button>
         ))}
