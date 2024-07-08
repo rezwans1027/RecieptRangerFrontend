@@ -9,6 +9,8 @@ const Register = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
+  // TODO: if a user is already in an organization then sign them out and/or redirect to sign up page
+
   useEffect(() => {
     if (!isSignedIn && isLoaded) {
       navigate(`/sign-up?redirect=${location.pathname}${location.search}`, {

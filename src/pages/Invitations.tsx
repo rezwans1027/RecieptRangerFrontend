@@ -1,5 +1,4 @@
 import { useGetInvitations } from '@/api/UserApi'
-import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -10,29 +9,28 @@ import {
 } from '@/components/ui/table'
 import { useEffect, useState } from 'react'
 import { formatRole, formatManager, formatTimeAgo } from '@/lib/utils'
+import Invite from '@/components/Invite'
 
 const Invitations = () => {
   const [invitationsList, setInvitationsList] = useState([])
-  const { invitations, isLoading } = useGetInvitations() 
+  const { invitations, isLoading } = useGetInvitations()
 
   useEffect(() => {
     if (invitations) {
       setInvitationsList(invitations)
     }
-  } , [invitations])
-
-  console.log(invitationsList)
+  }, [invitations])
 
   if (isLoading) {
-    return <div>Loading...</div> // TODO: Add a loader and remove this 
+    return <div>Loading...</div> // TODO: Add a loader and remove this
   }
   // TODO: only admin and manager should be able to see this page
-  // TODO: Make more responsive 
+  // TODO: Make more responsive
   return (
     <div className='h-screen w-[100%] bg-slate-200 p-8'>
-      <div className='flex items-center justify-between mb-6'>
+      <div className='mb-6 flex items-center justify-between'>
         <h1 className='text-2xl font-semibold'>Invitations</h1>
-        <Button className='px-5'>Invite</Button>
+        <Invite />
       </div>
       <div className='overflow-x-auto rounded-xl bg-white'>
         <Table className='min-w-full max-md:text-xs'>
@@ -50,7 +48,10 @@ const Invitations = () => {
                 <TableCell>{invitation.email}</TableCell>
                 <TableCell>{formatRole(invitation.role)}</TableCell>
                 <TableCell>{formatManager(invitation.manager)}</TableCell>
-                <TableCell className='text-right'>{formatTimeAgo(invitation.createdAt)}</TableCell>
+                {/* TODO: Add link to manager */}
+                <TableCell className='text-right'>
+                  {formatTimeAgo(invitation.createdAt)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

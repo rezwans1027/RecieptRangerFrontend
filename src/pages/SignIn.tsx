@@ -6,8 +6,6 @@ const SignIn = () => {
   const queryParams = new URLSearchParams(location.search)
   const redirect = queryParams.get('redirect')
 
-  console.log('redirect', redirect)
-
   return (
     <div className='flex h-screen items-center justify-center'>
       <SignInComponent
