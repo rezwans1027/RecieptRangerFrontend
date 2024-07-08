@@ -40,25 +40,25 @@ import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import { cn } from '@/lib/utils'
+import { cn, roleMapping } from '@/lib/utils'
 import { ChevronsUpDownIcon, CheckIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useGetManagers } from '@/api/UserApi'
+import { useGetManagers, useSendInvitation } from '@/api/UserApi'
+
 
 const formSchema = z.object({
   email: z.string().email().min(2, {
     message: 'Username must be at least 2 characters.',
   }),
-  role: z.string().min(2, {
-    message: 'Role must be at least 2 characters.',
-  }),
+  role: z.string(),
   manager: z.number().optional(),
 })
 
 const Invite = () => {
   const { managers, isLoading } = useGetManagers()
-  const [managerList, setManagerList] = useState([])
+  const [managerList, setManagerList] = useState<{ label: string; value: number }[]>([])
   const [open, setOpen] = useState(false)
+  const { sendInvitation } = useSendInvitation()
 
   useEffect(() => {
     if (!isLoading) {
@@ -69,7 +69,7 @@ const Invite = () => {
         }))
       )
     }
-  } , [managers, isLoading])
+  }, [managers, isLoading])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -80,12 +80,25 @@ const Invite = () => {
     },
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await sendInvitation({
+        email: values.email,
+        role: roleMapping[values.role], // Convert role to number
+        manager: values.manager,
+      })
+      console.log('Invitation sent!')
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
-    <Dialog onOpenChange={(isOpen) => { if (!isOpen) form.reset(); }}>
+    <Dialog
+      onOpenChange={isOpen => {
+        if (!isOpen) form.reset()
+      }}
+    >
       <DialogTrigger className='rounded-lg bg-black p-2 px-4 text-white'>
         Invite
       </DialogTrigger>
@@ -125,13 +138,12 @@ const Invite = () => {
                       <FormItem>
                         <FormLabel>Role</FormLabel>
                         <Select
-                          onValueChange={(value) => {
+                          onValueChange={value => {
                             field.onChange(value)
                             if (value === 'manager') {
                               form.setValue('manager', undefined)
                             }
                           }}
-                          defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger className='min-w-32'>
@@ -139,8 +151,8 @@ const Invite = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value='manager'>Manager</SelectItem>
-                            <SelectItem value='employee'>Employee</SelectItem>
+                            <SelectItem value="manager">Manager</SelectItem>
+                            <SelectItem value="employee">Employee</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -168,7 +180,8 @@ const Invite = () => {
                               >
                                 {field.value
                                   ? managerList.find(
-                                      (manager:any) => manager.value === field.value
+                                      (manager: any) =>
+                                        manager.value === field.value
                                     )?.label
                                   : 'Select Manager'}
                                 <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />

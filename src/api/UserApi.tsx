@@ -81,6 +81,53 @@ export const useUserOnboarding = (clerkId: string) => {
   return { onboardUser, isLoading, error }
 }
 
+export const useSendInvitation = () => {
+  const queryClient = useQueryClient()
+  const { getToken } = useAuth()
+
+  const sendInvitationRequest = async ({ email, role, manager }: { email: string, role: number, manager?: number }) => {
+    try {
+      const token = await getToken()
+
+      if (!token) {
+        throw new Error('No token found')
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/users/invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email, role, manager }),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error in sendInvitationRequest:', error)
+      throw error
+    }
+  }
+
+  const {
+    mutateAsync: sendInvitation,
+    isLoading,
+    error,
+  } = useMutation(sendInvitationRequest, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('fetchInvitations')
+    },
+  })
+
+  return { sendInvitation, isLoading, error }
+}
+
 export const useGetInvitation = (token: string) => {
   const getInvitationRequest = async () => {
     try {

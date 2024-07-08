@@ -17,3 +17,8 @@ export const formatRole = (role: string) => {
 export const formatManager = (manager: string | null) => {
   return manager ? (manager.trim().length !== 0 ? manager : 'None') : 'None'
 }
+
+export const roleMapping: { [key: string]: number } = {
+  manager: 2,
+  employee: 3,
+};
